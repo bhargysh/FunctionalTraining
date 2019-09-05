@@ -29,35 +29,74 @@ object RecursionExercises {
   def minusOne(n: Int) = n - 1
 
   // Add two non-negative Integers together.  You are only allowed to use plusOne and minusOne above
-  def add(a: Int, b: Int): Int = ???
+  def add(a: Int, b: Int): Int = a match {
+    case 0 => b // same as minusOne(plusOne(b))
+    case _ => add(minusOne(a), plusOne(b))
+  }
 
   // You are not permitted to use any list functions such as map, flatMap, ++, flatten etc
-  def sum(l: List[Int]): Int = ???
+  def sum(l: List[Int]): Int = l match {
+    case Nil => 0
+    case num :: tail => num + sum(tail)
+  }
 
   //Again no list functions are permitted for the following
-  def length[A](x: List[A]): Int = ???
+  def length[A](x: List[A]): Int = x match {
+    case Nil => 0
+    case _ :: tail => 1 + length(tail)
+  }
+
 
   // Do you notice anything similar between sum and length? Hmm...
 
   // Mapping over a list.  You are given a List of type A and a function converting an A to a B
   // and you give back a list of type B.  No list functions allowed!
-  def map[A, B](x: List[A], f: A => B): List[B] = ???
+  def map[A, B](x: List[A], f: A => B): List[B] = x match {
+    case Nil => Nil
+    case head :: tail => f(head) :: map(tail, f)
+  }
 
   // Given a function from A => Boolean, return a list with only those item where the function returned true.
-  def filter[A](x: List[A], f: A => Boolean): List[A] = ???
+  def filter[A](x: List[A], f: A => Boolean): List[A] = {
+    if (x.isEmpty) List()
+    else if (f(x.head)) x.head :: filter(x.tail, f)
+    else filter(x.tail, f)
+  }
+
   // This pattern should be familiar by now... psst... look at add.
-  def append[A](x: List[A], y: List[A]): List[A] = ???
+  def append[A](x: List[A], y: List[A]): List[A] = x match {
+    case Nil => y
+    case head :: tail => head :: append(tail, y)
+  }
 
   // Flatten a list of lists to a single list.  Remember you can't use list.flatten.  Can you use a previous
   // solution to solve this one?
-  def flatten[A](x: List[List[A]]): List[A] = ???
+  def flatten[A](x: List[List[A]]): List[A] = x match {
+    case Nil => List()
+    case head :: tail => head ::: flatten(tail)
+  }
 
   // Follow the types.  You've done a great job getting here. Follow the types.
-  def flatMap[A, B](x: List[A], f: A => List[B]): List[B] = ???
+  def flatMap[A, B](x: List[A], f: A => List[B]): List[B] = x match {
+    case Nil => List()
+        case head :: tail => f(head) ::: flatMap(tail, f)
+  }
 
   // Maximum of the empty list is 0
-  def maximum(x: List[Int]): Int = ???
+  def maximum(x: List[Int]): Int = {
+    if (x.isEmpty) {
+      0
+    }
+    else if (x.head >= maximum(x.tail)) {
+      x.head
+    } else {
+      maximum(x.tail)
+    }
+  }
 
   // Reverse a list
-  def reverse[A](x: List[A]): List[A] = ???
+  def reverse[A](x: List[A]): List[A] = x match {
+    case Nil => x
+    case head :: tail => reverse(tail) ::: List(head)
+  }
 }
