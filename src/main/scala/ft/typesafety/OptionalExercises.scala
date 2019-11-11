@@ -64,11 +64,24 @@ object OptionalExercises1 {
 
   val config = Map[String, String]("host" -> "rea.com", "port" -> "8080")
 
-  def getFromConfig(key: String): Option[String] = ???
+  def getFromConfig(key: String): Option[String] = {
+    if (key.isEmpty) {
+      None
+    } else {
+      config.get(key)
+    }
+  }
 
-  def lengthOfHost(): Option[Int] = ???
+  def lengthOfHost(): Option[Int] = config.get("host").map(str => str.length)
 
-  def portPlus1000(): Option[Int] = ???
+  def portPlus1000(): Option[Int] =
+    config.get("port").map(str => str.toInt + 1000)
+//  WHAT MAP DOES UNDER THE HOOD
+//  def portPlus1000(): Option[Int] = config.get("port") match {
+//      case Some(value) => Some(value.toInt + 1000)
+//      case None        => None
+//    }
+//  }
 }
 
 object OptionalExercises2 {
@@ -77,11 +90,30 @@ object OptionalExercises2 {
   val envs = Map("rea.com" -> "prod", "test.rea.com" -> "test", "amazon.com" -> "stage")
 
   // Should return the host string if successful or "couldn't resolve" if unsuccessful
-  def getEnvForHost(host: String): String = ???
+//  def getEnvForHost(host: String): String = {
+//    val hostName = hosts.get(host)
+//    hostName match {
+//      case Some(value) if envs.contains(value) => envs.get(value) match {
+//          case Some(x) => x
+//          case _    => "couldn't resolve"
+//        }
+//      case _        => "couldn't resolve"
+//    }
+//  }
+  def getEnvForHost(key: String): String = {
+    hosts.get(key).flatMap(host => envs.get(host)).getOrElse("couldn't resolve")
+  }
 
   // See how many ways you can implement this.
   // Will either return "Connected to <rea host>" or "not connected"
-  def connectToReaHostsOnly(host: String): String = ???
+  def connectToReaHostsOnly(host: String): String = {
+    val domain = hosts.getOrElse(host, "not connected")
+    if(domain.contains("rea")) {
+      createConnection(domain)
+    } else {
+      "not connected"
+    }
+  }
 
   def createConnection(domain: String): String = s"connected to $domain"
 }
@@ -105,19 +137,63 @@ object OptionalExercises3 {
 
   case object Nothing extends Maybe[Nothing]
 
-  def flatMap[A, B](m: Maybe[A])(f: A => Maybe[B]): Maybe[B] = ???
+  def flatMap[A, B](m: Maybe[A])(f: A => Maybe[B]): Maybe[B] = m match {
+      case Just(value) => f(value)
+      case Nothing   => Nothing
+    }
 
-  def map[A, B](m: Maybe[A])(f: A => B): Maybe[B] = ???
+  def map[A, B](m: Maybe[A])(f: A => B): Maybe[B] = m match {
+      case Just(value) => Just(f(value))
+      case Nothing   => Nothing
+    }
 
-  def fold[A, B](m: Maybe[A], default: => B, f: A => B): B = ???
+  def fold[A, B](m: Maybe[A], default: => B, f: A => B): B = m match {
+      case Just(value) => f(value)
+      case Nothing   => default
+    }
 
-  def orElse[A](m: Maybe[A], otherwise: => Maybe[A]): Maybe[A] = ???
+  def orElse[A](m: Maybe[A], otherwise: => Maybe[A]): Maybe[A] = m match {
+      case Just(value) => Just(value)
+      case Nothing   => otherwise
+    }
 
-  def orSome[A](m: Maybe[A], default: => A): A = ???
+  def orSome[A](m: Maybe[A], default: => A): A = m match {
+      case Just(value) => value
+      case Nothing   => default
+    }
 
-  def map2[A, B, C](f: (A, B) => C)(m1: Maybe[A], m2: Maybe[B]): Maybe[C] = ???
+//  def map2[A, B, C](f: (A, B) => C)(m1: Maybe[A], m2: Maybe[B]): Maybe[C] = m1 match {
+//      case Just(a) => m2 match {
+//            case Just(b) => Just(f(a, b))
+//            case Nothing => Nothing
+//          }
+//      case Nothing   => Nothing
+//  }
+  def map2[A, B, C](f: (A, B) => C)(m1: Maybe[A], m2: Maybe[B]): Maybe[C] = {
+    def aToC(a: A): Maybe[C] = {
+      map(m2)(b => f(a,b))
+    }
+  flatMap(m1)(aToC)
+  }
 
-  def sequence[A](l: List[Maybe[A]]): Maybe[List[A]] = ???
+  // List(Just(1), Just(2)) --> Just(List(1, 2))
+  def sequence[A](l: List[Maybe[A]]): Maybe[List[A]] = {
+    l match {
+      case Nil          => Nothing
+      case ::(head, tl) => head match {
+        case Just(get) => flatMap(Just(List(get)))(sequence(tl)) // idk aye
+        case Nothing   => Nothing
+      }
+    }
+  }
 
-  def ap[A, B](m1: Maybe[A], m2: Maybe[A => B]): Maybe[B] = ???
+  def ap[A, B](m1: Maybe[A], m2: Maybe[A => B]): Maybe[B] = {
+    def aToB(ab: A => B): Maybe[B] = ???
+    flatMap(m1)(???)
+
+    m2 match {
+        case Just(a) => aToB(a) // a = A => B, we need a func that takes a and gives back Maybe[B]
+        case Nothing   => ???
+    }
+  }
 }
