@@ -35,17 +35,30 @@ object RecursionExercises {
   }
 
   // You are not permitted to use any list functions such as map, flatMap, ++, flatten etc
-  def sum(l: List[Int]): Int = l match {
-    case Nil => 0
-    case num :: tail => num + sum(tail)
+//  def sum(l: List[Int]): Int = l match {
+//    case Nil => 0
+//    case num :: tail => num + sum(tail)
+//  }
+  def sum(l: List[Int]): Int = {
+    def innerSum(l: List[Int], acc: Int): Int = l match {
+        case Nil          => acc
+        case ::(head, tl) => innerSum(tl, head + acc)
+      }
+    innerSum(l, acc = 0)
   }
 
   //Again no list functions are permitted for the following
-  def length[A](x: List[A]): Int = x match {
-    case Nil => 0
-    case _ :: tail => 1 + length(tail)
+//  def length[A](x: List[A]): Int = x match {
+//    case Nil => 0
+//    case _ :: tail => 1 + length(tail)
+//  }
+  def length[A](x: List[A]): Int = {
+    def innerLength(x: List[A], acc: Int): Int = x match {
+        case Nil          => acc
+        case ::(_, tl) => innerLength(tl, acc + 1)
+      }
+    innerLength(x, acc = 0)
   }
-
 
   // Do you notice anything similar between sum and length? Hmm...
 
