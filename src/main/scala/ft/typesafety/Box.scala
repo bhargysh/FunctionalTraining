@@ -32,15 +32,20 @@ package ft.typesafety
 
 case class Box[A](get: A) {
   //Make it a Functor*
-  def map[B](f: A => B): Box[B] = ???
+  def map[B](f: A => B): Box[B] = Box(f(get))
 
   //Make it an Applicative*
-  def ap[B](bf: Box[A => B]): Box[B] = ???
+  def ap[B](bf: Box[A => B]): Box[B] = {
+    val value: Box[B] = bf.map { aToB =>
+      aToB.apply(get)
+    }
+    value
+  }
 
   //Make it a Monad*
-  def flatMap[B](f: A => Box[B]): Box[B] = ???
+  def flatMap[B](f: A => Box[B]): Box[B] = f(get)
 }
 
 object Box {
-  def join[A](box: Box[Box[A]]): Box[A] = ???
+  def join[A](box: Box[Box[A]]): Box[A] = box.get
 }
