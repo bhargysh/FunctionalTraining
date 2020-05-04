@@ -181,7 +181,7 @@ object OptionalExercises3 {
     l match {
       case Nil          => Nothing
       case ::(head, tl) => head match {
-        case Just(get) => flatMap(Just(List(get)))(sequence(tl)) // idk aye
+        case Just(get) => ??? // flatMap(Just(List(get)))(sequence(tl)) // idk aye
         case Nothing   => Nothing
       }
     }

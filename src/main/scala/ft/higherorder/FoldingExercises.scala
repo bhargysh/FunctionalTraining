@@ -20,12 +20,18 @@ package ft.higherorder
 
 object FoldingExercises {
 
-  def foldLeft[A, B](initialValue: B, list: List[A])(f: (B, A) => B): B = ???
+  def foldLeft[A, B](initialValue: B, list: List[A])(f: (B, A) => B): B = list match {
+      case Nil          => initialValue
+      case ::(head, tl) => foldLeft(f(initialValue, head), tl)(f)
+    }
 
   /**
    * foldRight is the same as foldLeft, except it processes the list from right to left.
    */
-  def foldRight[A, B](initialValue: B, list: List[A])(f: (A, B) => B): B = ???
+  def foldRight[A, B](initialValue: B, list: List[A])(f: (A, B) => B): B = list match {
+      case Nil          => initialValue
+      case ::(head, tl) => foldRight(f(head, initialValue), tl)(f)
+    }
   /**
    * Remember these, from our recursion exercises?  They can all be implemented with either
    * foldLeft or foldRight.
